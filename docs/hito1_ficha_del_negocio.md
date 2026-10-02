@@ -409,38 +409,24 @@ El modelo se concentra en solicitudes, ofertas, reservas y pagos. Para evitar qu
 
 ### Diagrama de estados
 
+```mermaid
 stateDiagram-v2
     [*] --> pendiente
-    
+
     pendiente --> confirmada: Administrador verifica pago
     pendiente --> cancelada: Cliente o administrador rechaza pago
-    
-    confirmada --> completada: Sistema (pasó hora fin)
-    confirmada --> cancelada: Cliente o administrador (antes de hora inicio)
-    
+
+    confirmada --> completada: Sistema, pasó la hora fin
+    confirmada --> cancelada: Cliente o administrador, antes de la hora inicio
+
     completada --> [*]
     cancelada --> [*]
-    
-    note right of pendiente
-        Oferta aceptada
-        Pago pendiente o no verificado
-    end note
-    
-    note right of confirmada
-        Pago verificado
-        Horario asegurado
-    end note
-    
-    note right of completada
-        Evento realizado
-        Listo para liquidar proveedor
-    end note
-    
-    note right of cancelada
-        Reserva anulada
-        No se liquida nada
-        Definitiva
-    end note
+
+    note right of pendiente: Oferta aceptada, pago pendiente o no verificado
+    note right of confirmada: Pago verificado, horario asegurado
+    note right of completada: Evento realizado, listo para liquidar al proveedor
+    note right of cancelada: Reserva anulada, no se liquida nada, es definitiva
+```
 
 
 
