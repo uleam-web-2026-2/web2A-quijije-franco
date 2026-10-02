@@ -7,7 +7,10 @@
 
 ## 1. Negocio de referencia
 
-El negocio de referencia es una plataforma digital de reservas y organización de partidos y eventos deportivos. Opera como un intermediario tecnológico que permite a los usuarios reservar canchas sintéticas, o solicitar servicios complementarios (arbitraje, indumentaria, bebidas). El modelo de ingresos se basa en el cobro de una comisión por cada transacción o reserva completada exitosamente a través de la plataforma, tanto al usuario final como al complejo deportivo por la gestión de la demanda. Plataformas similares en mercados internacionales han demostrado una alta tracción, reportando ingresos mensuales recurrentes superiores a los $50,000 dólares gracias a la automatización del proceso de reservas y a la fidelización de complejos deportivos que buscan maximizar el uso de sus instalaciones durante horas de baja demanda.
+El negocio de referencia es una plataforma digital de reservas y organización de partidos y eventos deportivos. Opera como un intermediario tecnológico bajo un modelo de subasta inversa: el cliente publica una solicitud (fecha, duración, número de personas y presupuesto máximo, además de servicios complementarios como arbitraje, indumentaria o bebidas) y los complejos deportivos compiten enviando ofertas con una de sus canchas sintéticas. Cuando el cliente acepta una oferta, paga a la cuenta de la plataforma; una vez realizado el evento, la plataforma liquida al proveedor el monto acordado menos su comisión.
+
+El modelo de ingresos se basa en una comisión que se cobra únicamente al proveedor por cada reserva completada exitosamente a través de la plataforma, como pago por la gestión de la demanda. El cliente paga exactamente el monto de la oferta que aceptó. Plataformas similares en mercados internacionales han demostrado una alta tracción, reportando ingresos mensuales recurrentes superiores a los $50,000 dólares gracias a la automatización del proceso de reservas y a la fidelización de complejos deportivos que buscan maximizar el uso de sus instalaciones durante horas de baja demanda.
+
 
 **Enlace:** (https://sportskey.com/)
 
@@ -19,18 +22,15 @@ Un caso de contraste común son las aplicaciones locales y regionales que digita
 
 ## 3. Adaptación al Ecuador
 
-1. Fuerte cultura del regateo y negociación: En Ecuador, los clientes están acostumbrados a negociar directamente el precio de los servicios o eventos grupales.
-Efecto: Los usuarios intentarían lanzar ofertas con precios absurdamente bajos que no cubren los costos operativos de los complejos deportivos.
+1. **Fuerte cultura del regateo y negociación:** en Ecuador, los clientes están acostumbrados a negociar directamente el precio de los servicios o eventos grupales. *Efecto:* los usuarios intentarían publicar solicitudes con presupuestos absurdamente bajos que no cubren los costos operativos de los complejos deportivos.
+2. **Alta preferencia por transferencias bancarias directas:** aunque existen pasarelas de pago, los complejos y usuarios prefieren la transferencia (P2P) para evitar comisiones bancarias altas. *Efecto:* el sistema no puede automatizar el cobro instantáneo con tarjeta, por lo que requiere un estado intermedio de validación manual del comprobante de pago.
+3. **Alto índice de "no-shows" (clientes que reservan y no se presentan):** existe poca penalización cultural por faltar a una reserva verbal o digital no pagada. *Efecto:* se exige el pago de la oferta aceptada antes de bloquear el horario en el complejo.
 
-2. Alta preferencia por transferencias bancarias directas: Aunque existen pasarelas de pago, los complejos y usuarios prefieren el pago por transferencia (P2P) para evitar comisiones bancarias altas.
-Efecto: El sistema no puede automatizar el cobro instantáneo mediante tarjeta sin fricción, requiriendo un estado intermedio de validación manual del comprobante de pago.
+**Qué cambió en el modelo por estas restricciones:**
 
-3. Alto índice de "no-shows" (clientes que reservan y no se presentan): Existe poca penalización cultural por faltar a una reserva verbal o digital no pagada.
-Efecto: Exigencia obligatoria de un abono parcial o validación estricta de la oferta aceptada antes de bloquear el horario en el complejo.
-
-**Qué cambió en el modelo por estas restricciones:** 
-Qué cambió en el modelo por estas restricciones: Se incorporó la entidad CatalogoBase con un atributo de precio_minimo, y se implementó una regla de validación estricta en el servidor backend que rechaza automáticamente cualquier Solicitud cuyo presupuesto_cliente esté por debajo del costo operativo base establecido por los proveedores.
-
+- **Regateo:** la negociación se canaliza con la subasta inversa. El cliente fija su `presupuesto_maximo` y los proveedores compiten con ofertas. Además, el backend rechaza con error 422 cualquier `Solicitud` cuyo `presupuesto_maximo` esté por debajo del `precio_referencia` más bajo registrado en las canchas de los proveedores, de modo que no se publiquen solicitudes que ningún complejo podría cubrir.
+- **Transferencias P2P:** la entidad `Pago` guarda la `url_comprobante` y un `estado` (`pendiente|verificado|rechazado`) que valida manualmente el administrador. El proveedor registra sus datos bancarios (`banco`, `numero_cuenta`, `titular_cuenta`) para recibir la liquidación, y la `Reserva` guarda `comision_app`, `monto_proveedor`, `estado_liquidacion` y el `comprobante_liquidacion` de esa transferencia.
+- **No-shows:** la `Reserva` nace en estado `pendiente` y solo pasa a `confirmada` cuando el pago de la oferta queda `verificado`. Hasta ese momento el horario no se considera asegurado. Se permite un solo `Pago` por `Oferta`.
 ## 4. Modelo de datos
 
 ### Entidad: Usuario
