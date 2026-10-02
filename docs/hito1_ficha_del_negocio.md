@@ -2,7 +2,7 @@
 
 **Pareja:** John Franco · Jose Quijije
 **Paralelo:** Aplicación para el Servidor Web A / Aplicaciones Web II A
-**Negocio en una línea:** (qué vende, a quién)
+**Negocio en una línea:** Reservas de canchas sintéticas y servicios deportivos entre clientes y complejos deportivos.
 
 
 ## 1. Negocio de referencia
@@ -448,8 +448,6 @@ stateDiagram-v2
 | Cancelar reserva | solo los suyos (si está pendiente o confirmada) | no | todos |
 | Registrar liquidación al proveedor | no | no | todos |
 | Ver comisión y monto a recibir | no | solo los suyos | todos |
-
-## 7. Mapa de endpoints por rol
 
 ## 7. Mapa de endpoints por rol
 
