@@ -5,9 +5,13 @@ Backend Go para una plataforma de subasta inversa de canchas deportivas. El fluj
 ## Ejecución
 
 ```powershell
-$env:JWT_SECRET='una-clave-local-larga'
+$bytes = New-Object byte[] 32
+[Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
+$env:JWT_SECRET = [Convert]::ToBase64String($bytes)
 go run .
 ```
+
+`JWT_SECRET` es una variable de entorno que Go utiliza para firmar y validar tokens JWT; no es la contraseña de PostgreSQL.
 
 Si se define `DATABASE_URL`, el arranque conecta a PostgreSQL y aplica de forma idempotente [001_init.sql](internal/db/migrations/001_init.sql), sin eliminar datos.
 
