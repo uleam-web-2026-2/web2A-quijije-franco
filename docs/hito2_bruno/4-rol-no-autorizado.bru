@@ -1,0 +1,5 @@
+meta { name: 4 · Cliente recibe 403 type: http seq: 4 }
+patch {{baseUrl}}/reservas/{{id}}/estado
+auth: bearer {{clientToken}}
+headers { Content-Type: application/json }
+body:json { {"estado":"confirmada"} }

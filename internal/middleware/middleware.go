@@ -6,7 +6,7 @@ import (
 	"time"
 
 	// REMPLAZA con la ruta de tu módulo
-	"github.com/uleam-web-2026-2/servA-quijije-franco/internal/respuesta" 
+	"github.com/uleam-web-2026-2/servA-quijije-franco/internal/respuesta"
 )
 
 type grabador struct {
@@ -24,7 +24,7 @@ func Registro(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		inicio := time.Now()
 		g := &grabador{ResponseWriter: w, estado: http.StatusOK}
-		
+
 		next.ServeHTTP(g, r) // Procesa la petición
 
 		// Se coloca DESPUÉS de next.ServeHTTP porque el estadoHTTP y el tiempo transcurrido

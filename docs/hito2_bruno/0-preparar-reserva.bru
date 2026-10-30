@@ -1,0 +1,16 @@
+meta { name: 0 · Preparar reserva type: http seq: 0 }
+post {{baseUrl}}/reservas
+auth: bearer {{adminToken}}
+headers { Content-Type: application/json }
+body:json { {"oferta_id": 1, "inicio": "2030-10-15T19:00:00Z", "fin": "2030-10-15T20:30:00Z", "monto_acordado": 35, "pago_estado":"verificado", "pago_url":"demo://comprobante"} }
+script:pre-request {
+  const admin = await bru.sendRequest({ method: "POST", url: `${bru.getEnvVar("baseUrl")}/login`, headers: {"Content-Type":"application/json"}, data: {correo:"admin@reservas.local", password:"admin-2026"} });
+  const client = await bru.sendRequest({ method: "POST", url: `${bru.getEnvVar("baseUrl")}/login`, headers: {"Content-Type":"application/json"}, data: {correo:"cliente@reservas.local", password:"cliente-2026"} });
+  bru.setEnvVar("adminToken", admin.data.datos.token);
+  bru.setEnvVar("clientToken", client.data.datos.token);
+  req.setHeader("Authorization", "Bearer " + admin.data.datos.token);
+}
+script:post-response {
+  const data = res.getBody();
+  bru.setEnvVar("id", String(data.datos.reserva_id));
+}

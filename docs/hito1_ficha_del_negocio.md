@@ -449,6 +449,12 @@ stateDiagram-v2
 | Registrar liquidación al proveedor | no | no | todos |
 | Ver comisión y monto a recibir | no | solo los suyos | todos |
 
+## Actualización Hito 2
+
+Se mantienen las diez entidades y las relaciones descritas en esta ficha. Para la demostración del Hito 2 se elige `Reserva` como entidad principal porque posee la máquina de estados; `Solicitud`, `Oferta` y `Pago` no se eliminan y los endpoints aún no implementados se marcan `(plan)` en `docs/openapi.yaml`.
+
+La transición `pendiente -> confirmada` exige que el `Pago` asociado a la `Oferta` tenga estado `verificado`; si no existe o está `pendiente`/`rechazado`, la API responde `422`. La confirmación es exclusiva del administrador. La cancelación se permite al cliente propietario o administrador, antes del inicio cuando la reserva ya está confirmada.
+
 ## 7. Mapa de endpoints por rol
 
 | Endpoint | Rol que lo llama | Pantalla que lo consume | Qué devuelve | Qué valida | Código si falla |

@@ -11,6 +11,8 @@ type detalleError struct {
 	Mensaje string `json:"mensaje"`
 }
 
+// DetalleError es público para que los handlers puedan reutilizar el contrato.
+
 type envoltura struct {
 	OK    bool          `json:"ok"`
 	Datos any           `json:"datos,omitempty"` // omitempty: se omite si vacío

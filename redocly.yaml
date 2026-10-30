@@ -1,0 +1,5 @@
+extends: []
+rules:
+  security-defined: error
+  operation-operationId: error
+  no-unresolved-refs: error

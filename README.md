@@ -1,18 +1,24 @@
-# Servidor 
+# API de reservas deportivas · Hito 2
 
-Servidor HTTP desarrollado en Go utilizando el enrutador Chi para la gestión centralizada de tickets de soporte técnico universitario.
+Backend Go para una plataforma de subasta inversa de canchas deportivas. El flujo principal es `Reserva`: inicia pendiente, el administrador puede confirmarla y las transiciones inválidas responden `422`.
 
-## Tabla de Rutas
+## Ejecución
 
-| Método | Ruta | Éxito | Errores posibles |
-| ------ | ---- | ----- | ---------------- |
-| `GET` | `/tickets` | `200 OK` (lista de tickets) | - |
-| `POST` | `/tickets` | `201 Created` (ticket creado) | `400` (`cuerpo_malformado`, `datos_invalidos`) |
-| `GET` | `/tickets/{id}` | `200 OK` (ticket encontrado) | `400` (`id_invalido`), `404` (`no_encontrado`) |
-| `GET` | `/explotar` | - | `500` (`error_interno`) |
-| `*` | Ruta inexistente | - | `404` (`ruta_inexistente`) |
-| `*` | Método no soportado | - | `405` (`metodo_no_permitido`) |
+```powershell
+$env:JWT_SECRET='una-clave-local-larga'
+go run .
+```
 
----
+Si se define `DATABASE_URL`, el arranque conecta a PostgreSQL y aplica de forma idempotente [001_init.sql](internal/db/migrations/001_init.sql), sin eliminar datos.
 
-Revisión cruzada: Revisado por [Nombre de tu compañero]: sin hallazgos
+## Verificaciones
+
+```powershell
+go test ./...
+go vet ./...
+npx @redocly/cli lint docs/openapi.yaml --config redocly.yaml --format stylish
+```
+
+La colección está en [docs/hito2_bruno/](docs/hito2_bruno/), y las cuentas ficticias en [docs/hito2_hoja.md](docs/hito2_hoja.md).
+
+Las rutas heredadas `/tickets` y `/explotar` no se registran en la API final: pertenecían a la plantilla de mesa de ayuda y no al negocio de reservas deportivas.
