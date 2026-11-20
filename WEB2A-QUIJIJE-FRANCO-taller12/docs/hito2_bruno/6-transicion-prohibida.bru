@@ -1,0 +1,5 @@
+meta { name: 6 · Transición prohibida 422 type: http seq: 6 }
+patch {{baseUrl}}/reservas/{{id}}/estado
+auth: bearer {{adminToken}}
+headers { Content-Type: application/json }
+body:json { {"estado":"confirmada"} }

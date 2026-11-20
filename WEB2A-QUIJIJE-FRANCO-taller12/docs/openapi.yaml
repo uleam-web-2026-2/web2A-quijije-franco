@@ -1,0 +1,77 @@
+openapi: 3.0.3
+info:
+  title: API de reservas deportivas
+  version: 2.0.0
+  description: Plataforma de subasta inversa para reservar canchas deportivas.
+servers:
+  - url: http://localhost:8080
+paths:
+  /login:
+    post:
+      operationId: login
+      summary: Iniciar sesión
+      security: []
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/Login'}}}
+      responses: {'200': {description: Token JWT}, '401': {description: Credenciales inválidas}}
+  /reservas:
+    get:
+      operationId: listarReservas
+      summary: Listar reservas
+      security: [{bearerAuth: []}]
+      responses: {'200': {description: OK}, '401': {description: Sin token}}
+    post:
+      operationId: crearReserva
+      summary: Crear reserva de demostración
+      security: [{bearerAuth: []}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/ReservaEntrada'}}}}
+      responses: {'201': {description: Creada}, '401': {description: Sin token}, '422': {description: Datos inválidos}}
+  /reservas/{id}:
+    get:
+      operationId: obtenerReserva
+      summary: Obtener una reserva
+      security: [{bearerAuth: []}]
+      parameters: [{$ref: '#/components/parameters/id'}]
+      responses: {'200': {description: OK}, '401': {description: Sin token}, '404': {description: No encontrada}}
+  /reservas/{id}/estado:
+    patch:
+      operationId: cambiarEstadoReserva
+      summary: Cambiar estado de Reserva
+      security: [{bearerAuth: []}]
+      parameters: [{$ref: '#/components/parameters/id'}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/CambioEstado'}}}}
+      responses: {'200': {description: Actualizada}, '401': {description: Sin token}, '403': {description: Rol no autorizado}, '422': {description: Transición prohibida o Pago no verificado}}
+  /solicitudes:
+    get: {operationId: listarSolicitudes, summary: Listar solicitudes (plan), security: [{bearerAuth: []}], responses: {'200': {description: Plan}, '401': {description: Sin token}}}
+    post: {operationId: crearSolicitud, summary: Crear solicitud (plan), security: [{bearerAuth: []}], responses: {'201': {description: Plan}, '401': {description: Sin token}, '403': {description: Rol no autorizado}, '422': {description: Datos inválidos}}}
+  /solicitudes/{id}:
+    get: {operationId: obtenerSolicitud, summary: Obtener solicitud (plan), security: [{bearerAuth: []}], parameters: [{$ref: '#/components/parameters/id'}], responses: {'200': {description: Plan}, '401': {description: Sin token}, '403': {description: Prohibido}, '404': {description: No encontrada}}}
+    put: {operationId: editarSolicitud, summary: Editar solicitud (plan), security: [{bearerAuth: []}], parameters: [{$ref: '#/components/parameters/id'}], responses: {'200': {description: Plan}, '401': {description: Sin token}, '403': {description: Prohibido}, '409': {description: Conflicto}, '422': {description: Inválida}}}
+    delete: {operationId: cancelarSolicitud, summary: Cancelar solicitud (plan), security: [{bearerAuth: []}], parameters: [{$ref: '#/components/parameters/id'}], responses: {'204': {description: Plan}, '401': {description: Sin token}, '403': {description: Prohibido}, '409': {description: Conflicto}}}
+  /solicitudes/{id}/ofertas:
+    post: {operationId: crearOferta, summary: Enviar oferta (plan), security: [{bearerAuth: []}], parameters: [{$ref: '#/components/parameters/id'}], responses: {'201': {description: Plan}, '401': {description: Sin token}, '403': {description: Prohibido}, '404': {description: No encontrada}, '422': {description: Inválida}}}
+  /usuarios: {get: {operationId: listarUsuarios, summary: Usuarios (plan), security: [{bearerAuth: []}], responses: {'200': {description: Plan}, '401': {description: Sin token}}}}
+  /clientes: {get: {operationId: listarClientes, summary: Clientes (plan), security: [{bearerAuth: []}], responses: {'200': {description: Plan}, '401': {description: Sin token}}}}
+  /proveedores: {get: {operationId: listarProveedores, summary: Proveedores (plan), security: [{bearerAuth: []}], responses: {'200': {description: Plan}, '401': {description: Sin token}}}}
+  /complejos: {get: {operationId: listarComplejos, summary: Complejos (plan), security: [{bearerAuth: []}], responses: {'200': {description: Plan}, '401': {description: Sin token}}}}
+  /canchas: {get: {operationId: listarCanchas, summary: Canchas (plan), security: [{bearerAuth: []}], responses: {'200': {description: Plan}, '401': {description: Sin token}}}}
+  /ofertas: {get: {operationId: listarOfertas, summary: Ofertas (plan), security: [{bearerAuth: []}], responses: {'200': {description: Plan}, '401': {description: Sin token}}}}
+  /pagos: {get: {operationId: listarPagos, summary: Pagos (plan), security: [{bearerAuth: []}], responses: {'200': {description: Plan}, '401': {description: Sin token}}}}
+components:
+  securitySchemes: {bearerAuth: {type: http, scheme: bearer, bearerFormat: JWT}}
+  parameters: {id: {name: id, in: path, required: true, schema: {type: integer, minimum: 1}}}
+  schemas:
+    Login: {type: object, required: [correo, password], properties: {correo: {type: string}, password: {type: string}}}
+    CambioEstado: {type: object, required: [estado], properties: {estado: {type: string, enum: [pendiente, confirmada, completada, cancelada]}}}
+    ReservaEntrada: {type: object, required: [oferta_id, inicio, fin, monto_acordado], properties: {oferta_id: {type: integer, minimum: 1}, inicio: {type: string, format: date-time}, fin: {type: string, format: date-time}, monto_acordado: {type: number}, pago_estado: {type: string, enum: [pendiente, verificado, rechazado], description: Solo para preparar la demostración}, pago_url: {type: string}}}
+    Usuario: {type: object, properties: {usuario_id: {type: integer}, nombre: {type: string}, correo: {type: string}, rol: {type: string}}}
+    Cliente: {type: object, properties: {cliente_id: {type: integer}, usuario_id: {type: integer}, cedula: {type: string}, telefono: {type: string}}}
+    Proveedor: {type: object, properties: {proveedor_id: {type: integer}, usuario_id: {type: integer}, ruc: {type: string}, telefono: {type: string}, banco: {type: string}, numero_cuenta: {type: string}, titular_cuenta: {type: string}}}
+    Complejo: {type: object, properties: {complejo_id: {type: integer}, proveedor_id: {type: integer}, nombre: {type: string}, direccion: {type: string}, ciudad: {type: string}}}
+    Cancha: {type: object, properties: {cancha_id: {type: integer}, complejo_id: {type: integer}, tipo: {type: string}, capacidad: {type: integer}, precio_referencia: {type: number}}}
+    Solicitud: {type: object, properties: {solicitud_id: {type: integer}, cliente_id: {type: integer}, fecha_evento: {type: string, format: date-time}, duracion_minutos: {type: integer}, cantidad_personas: {type: integer}, presupuesto_maximo: {type: number}, estado: {type: string}}}
+    ItemSolicitud: {type: object, properties: {item_id: {type: integer}, solicitud_id: {type: integer}, tipo: {type: string}, cantidad: {type: integer}, detalle: {type: string}}}
+    Oferta: {type: object, properties: {oferta_id: {type: integer}, solicitud_id: {type: integer}, complejo_id: {type: integer}, cancha_id: {type: integer}, monto_total: {type: number}, detalle: {type: string}, vence_en: {type: string, format: date-time}, estado: {type: string}}}
+    Reserva: {type: object, properties: {reserva_id: {type: integer}, oferta_id: {type: integer}, inicio: {type: string, format: date-time}, fin: {type: string, format: date-time}, monto_acordado: {type: number}, comision_app: {type: number}, monto_proveedor: {type: number}, estado: {type: string}, estado_liquidacion: {type: string}, comprobante_liquidacion: {type: string}}}
+    Pago: {type: object, properties: {pago_id: {type: integer}, oferta_id: {type: integer}, monto: {type: number}, url_comprobante: {type: string}, estado: {type: string}, fecha_pago: {type: string, format: date-time}}}

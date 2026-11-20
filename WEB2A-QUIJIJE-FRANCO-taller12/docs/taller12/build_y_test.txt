@@ -1,0 +1,14 @@
+$ go build
+Exit code: 0
+
+$ go test
+ok  	github.com/uleam-web-2026-2/servA-quijije-franco	(cached)
+?   	github.com/uleam-web-2026-2/servA-quijije-franco/internal/auth	[no test files]
+?   	github.com/uleam-web-2026-2/servA-quijije-franco/internal/db	[no test files]
+ok  	github.com/uleam-web-2026-2/servA-quijije-franco/internal/httpapi	(cached)
+?   	github.com/uleam-web-2026-2/servA-quijije-franco/internal/middleware	[no test files]
+?   	github.com/uleam-web-2026-2/servA-quijije-franco/internal/modelos	[no test files]
+ok  	github.com/uleam-web-2026-2/servA-quijije-franco/internal/reservas	(cached)
+?   	github.com/uleam-web-2026-2/servA-quijije-franco/internal/respuesta	[no test files]
+?   	github.com/uleam-web-2026-2/servA-quijije-franco/internal/tickets	[no test files]
+Exit code: 0

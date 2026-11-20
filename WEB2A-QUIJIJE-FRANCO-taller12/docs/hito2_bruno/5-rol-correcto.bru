@@ -1,0 +1,5 @@
+meta { name: 5 · Admin confirma type: http seq: 5 }
+patch {{baseUrl}}/reservas/{{id}}/estado
+auth: bearer {{adminToken}}
+headers { Content-Type: application/json }
+body:json { {"estado":"confirmada"} }

@@ -1,0 +1,9 @@
+2026/11/20 12:12:40 API de reservas deportivas en :53250
+2026/11/20 12:12:40 GET /reservas -> 401 (0s)
+2026/11/20 12:12:40 POST /login -> 200 (1.9844ms)
+2026/11/20 12:12:40 GET /reservas -> 200 (0s)
+2026/11/20 12:12:40 POST /login -> 200 (1.0382ms)
+2026/11/20 12:12:40 POST /reservas -> 201 (0s)
+2026/11/20 12:12:40 PATCH /reservas/1/estado -> 403 (0s)
+2026/11/20 12:12:40 PATCH /reservas/1/estado -> 200 (0s)
+2026/11/20 12:12:40 PATCH /reservas/1/estado -> 422 (0s)
