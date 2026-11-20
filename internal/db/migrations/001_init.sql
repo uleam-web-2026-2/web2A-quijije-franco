@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS usuarios (usuario_id BIGSERIAL PRIMARY KEY,nombre TEXT NOT NULL,correo TEXT NOT NULL UNIQUE,password TEXT NOT NULL,rol TEXT NOT NULL CHECK (rol IN ('cliente','proveedor','admin')));
+CREATE TABLE IF NOT EXISTS clientes (cliente_id BIGSERIAL PRIMARY KEY,usuario_id BIGINT NOT NULL UNIQUE REFERENCES usuarios(usuario_id),cedula TEXT NOT NULL UNIQUE,telefono TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS proveedores (proveedor_id BIGSERIAL PRIMARY KEY,usuario_id BIGINT NOT NULL UNIQUE REFERENCES usuarios(usuario_id),ruc TEXT NOT NULL UNIQUE,telefono TEXT NOT NULL,banco TEXT NOT NULL,numero_cuenta TEXT NOT NULL,titular_cuenta TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS complejos (complejo_id BIGSERIAL PRIMARY KEY,proveedor_id BIGINT NOT NULL REFERENCES proveedores(proveedor_id),nombre TEXT NOT NULL,direccion TEXT NOT NULL,ciudad TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS canchas (cancha_id BIGSERIAL PRIMARY KEY,complejo_id BIGINT NOT NULL REFERENCES complejos(complejo_id),tipo TEXT NOT NULL,capacidad INTEGER NOT NULL CHECK(capacidad>0),precio_referencia NUMERIC(10,2) NOT NULL CHECK(precio_referencia>0));
+CREATE TABLE IF NOT EXISTS solicitudes (solicitud_id BIGSERIAL PRIMARY KEY,cliente_id BIGINT NOT NULL REFERENCES clientes(cliente_id),fecha_evento TIMESTAMPTZ NOT NULL,duracion_minutos INTEGER NOT NULL,cantidad_personas INTEGER NOT NULL,presupuesto_maximo NUMERIC(10,2) NOT NULL,estado TEXT NOT NULL DEFAULT 'abierta' CHECK(estado IN('abierta','adjudicada','cancelada')));
+CREATE TABLE IF NOT EXISTS item_solicitudes (item_id BIGSERIAL PRIMARY KEY,solicitud_id BIGINT NOT NULL REFERENCES solicitudes(solicitud_id),tipo TEXT NOT NULL,cantidad INTEGER NOT NULL,detalle TEXT);
+CREATE TABLE IF NOT EXISTS ofertas (oferta_id BIGSERIAL PRIMARY KEY,solicitud_id BIGINT NOT NULL REFERENCES solicitudes(solicitud_id),complejo_id BIGINT NOT NULL REFERENCES complejos(complejo_id),cancha_id BIGINT NOT NULL REFERENCES canchas(cancha_id),monto_total NUMERIC(10,2) NOT NULL,detalle TEXT,vence_en TIMESTAMPTZ NOT NULL,estado TEXT NOT NULL DEFAULT 'pendiente' CHECK(estado IN('pendiente','aceptada','rechazada','vencida')));
+CREATE TABLE IF NOT EXISTS reservas (reserva_id BIGSERIAL PRIMARY KEY,oferta_id BIGINT UNIQUE NOT NULL REFERENCES ofertas(oferta_id),inicio TIMESTAMPTZ NOT NULL,fin TIMESTAMPTZ NOT NULL,monto_acordado NUMERIC(10,2) NOT NULL,comision_app NUMERIC(10,2) NOT NULL,monto_proveedor NUMERIC(10,2) NOT NULL,estado TEXT NOT NULL DEFAULT 'pendiente' CHECK(estado IN('pendiente','confirmada','completada','cancelada')),estado_liquidacion TEXT NOT NULL DEFAULT 'pendiente',comprobante_liquidacion TEXT);
+CREATE TABLE IF NOT EXISTS pagos (pago_id BIGSERIAL PRIMARY KEY,oferta_id BIGINT UNIQUE NOT NULL REFERENCES ofertas(oferta_id),monto NUMERIC(10,2) NOT NULL,url_comprobante TEXT NOT NULL,estado TEXT NOT NULL DEFAULT 'pendiente' CHECK(estado IN('pendiente','verificado','rechazado')),fecha_pago TIMESTAMPTZ NOT NULL);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_canchas_complejo_cancha ON canchas(complejo_id,cancha_id);
+DO $$ BEGIN
+ IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname='fk_oferta_cancha_complejo') THEN
+  ALTER TABLE ofertas ADD CONSTRAINT fk_oferta_cancha_complejo FOREIGN KEY (complejo_id,cancha_id) REFERENCES canchas(complejo_id,cancha_id);
+ END IF;
+END $$;

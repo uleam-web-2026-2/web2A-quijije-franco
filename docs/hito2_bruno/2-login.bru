@@ -1,0 +1,5 @@
+meta { name: 2 · Login admin type: http seq: 2 }
+post {{baseUrl}}/login
+headers { Content-Type: application/json }
+body:json { {"correo":"admin@reservas.local","password":"admin-2026"} }
+script:post-response { const data = res.getBody(); bru.setEnvVar("adminToken", data.datos.token) }
